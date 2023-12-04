@@ -411,8 +411,11 @@ public readonly struct Country : IEquatable<Country>, IComparable<Country>, ICom
     }
 
     public static Country Parse(string s)
+        => Parse(s, format: null);
+    
+    public static Country Parse(string s, CountryFormat? format)
     {
-        if (!TryParse(s, out Country country))
+        if (!TryParse(s, format, out Country country))
             throw new FormatException();
 
         return country;
