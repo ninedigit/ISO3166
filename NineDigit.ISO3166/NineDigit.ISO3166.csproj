@@ -1,7 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-    <Import Project="..\CreateNuGetPackage.props" />
-    
     <PropertyGroup>
         <TargetFramework>netstandard2.1</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
@@ -11,9 +9,9 @@
         <Title>NineDigit.ISO3166</Title>
         <Authors>Tomáš Peťovský</Authors>
         <Company>Nine Digit, s.r.o.</Company>
-        <Version>1.1.0</Version>
-        <InformationalVersion>1.1.0</InformationalVersion>
-        <PackageVersion>1.1.0</PackageVersion>
+        <Version>2.0.0</Version>
+        <InformationalVersion>2.0.0-alpha.1</InformationalVersion>
+        <PackageVersion>2.0.0-alpha.1</PackageVersion>
         <Description>ISO 3166-1 country list for .NET</Description>
         <PackageDescription>ISO 3166-1 country list for .NET</PackageDescription>
         <PackageTags>iso iso3166 countries</PackageTags>
@@ -23,12 +21,20 @@
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <IncludeSymbols>true</IncludeSymbols>
-        <Copyright>(c) 2023</Copyright>
+        <Copyright>(c) 2024</Copyright>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     </PropertyGroup>
 
+    <!-- Copy NuGet packages -->
+    <Target Name="CopyNuGetToDist" AfterTargets="Pack" Condition="$(Configuration.StartsWith('Release'))">
+        <Message Text="NuGet package copying ..." Importance="high" />
+        <Message Text="Copied $(AssemblyName).$(PackageVersion).nupkg to $(SolutionDir)Dist" Importance="high" />
+        <Copy SourceFiles="$(ProjectDir)$(BaseOutputPath)$(Configuration)\$(AssemblyName).$(PackageVersion).nupkg" DestinationFolder="$(SolutionDir)Dist" />
+        <Copy SourceFiles="$(ProjectDir)$(BaseOutputPath)$(Configuration)\$(AssemblyName).$(PackageVersion).snupkg" DestinationFolder="$(SolutionDir)Dist" />
+    </Target>
+
     <ItemGroup>
-        <None Include="README.md" Pack="true" PackagePath="\" />
+        <None Include="$(SolutionDir)README.md" Pack="true" PackagePath="\" />
     </ItemGroup>
 
     <ItemGroup>

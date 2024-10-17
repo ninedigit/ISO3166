@@ -14,7 +14,7 @@ public class CountryTests
     [Fact]
     public void TryGetByCountryName_ReturnsTrueForExistingCountry()
     {
-        var exists = Country.TryGetByCountryName("Slovakia", out var country);
+        var exists = Country.TryGetByName("Slovakia", out var country);
         
         Assert.True(exists);
         Assert.Equal(Country.SK, country);
@@ -23,7 +23,7 @@ public class CountryTests
     [Fact]
     public void TryGetByCountryName_ReturnsFalseForNonExistingCountry()
     {
-        var exists = Country.TryGetByCountryName("Slavicia", out var country);
+        var exists = Country.TryGetByName("Slavicia", out var country);
         
         Assert.False(exists);
         Assert.Equal(default, country);

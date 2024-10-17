@@ -2,7 +2,7 @@ namespace NineDigit.ISO3166;
 
 public enum CountryFormat
 {
-    CountryName,
+    Name,
     TwoLetterCode,
     ThreeLetterCode,
     NumericCode
