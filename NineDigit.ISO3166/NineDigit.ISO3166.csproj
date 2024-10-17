@@ -10,8 +10,8 @@
         <Authors>Tomáš Peťovský</Authors>
         <Company>Nine Digit, s.r.o.</Company>
         <Version>2.0.0</Version>
-        <InformationalVersion>2.0.0-alpha.1</InformationalVersion>
-        <PackageVersion>2.0.0-alpha.1</PackageVersion>
+        <InformationalVersion>2.0.0-alpha.2</InformationalVersion>
+        <PackageVersion>2.0.0-alpha.2</PackageVersion>
         <Description>ISO 3166-1 country list for .NET</Description>
         <PackageDescription>ISO 3166-1 country list for .NET</PackageDescription>
         <PackageTags>iso iso3166 countries</PackageTags>

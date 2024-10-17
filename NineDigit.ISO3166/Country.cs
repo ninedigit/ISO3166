@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Text.RegularExpressions;
 
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
@@ -20,8 +21,12 @@ public readonly struct Country : IEquatable<Country>, IComparable<Country>, ICom
     private static readonly StringComparer ThreeLetterCodeComparer = StringComparer.OrdinalIgnoreCase;
     private static readonly StringComparer NumericCodeComparer = StringComparer.Ordinal;
     
-    private static readonly ISet<Country> Items = new HashSet<Country>();
-    
+    private static readonly IList<Country> Items = new List<Country>();
+    private static readonly IDictionary<string, int> TwoLetterCodeCountryIndexMap =
+        new Dictionary<string, int>(TwoLetterCodeComparer);
+    private static readonly IDictionary<string, int> ThreeLetterCodeCountryIndexMap =
+        new Dictionary<string, int>(ThreeLetterCodeComparer);
+
     private Country(
         string name,
         string twoLetterCode,
@@ -30,6 +35,18 @@ public readonly struct Country : IEquatable<Country>, IComparable<Country>, ICom
         Continent continent,
         CountryCodeType codeType = CountryCodeType.OfficiallyAssigned)
     {
+        if (string.IsNullOrEmpty(name))
+            throw new ArgumentException("Value can not be null nor empty.", nameof(name));
+
+        if (twoLetterCode is null || !Regex.IsMatch(twoLetterCode, "^[A-Z]{2}$"))
+            throw new ArgumentException("Value must be a two-letter code.", nameof(twoLetterCode));
+
+        if (threeLetterCode is null || !Regex.IsMatch(threeLetterCode, "^[A-Z]{3}$"))
+            throw new ArgumentException("Value must be a two-letter code.", nameof(twoLetterCode));
+
+        if (numericCode is null || !Regex.IsMatch(numericCode, "^[0-9]{3}$"))
+            throw new ArgumentException("Value must be a three-digit code.", nameof(twoLetterCode));
+        
         Name = name;
         TwoLetterCode = twoLetterCode;
         ThreeLetterCode = threeLetterCode;
@@ -54,6 +71,50 @@ public readonly struct Country : IEquatable<Country>, IComparable<Country>, ICom
     public string NumericCode { get; }
     public Continent Continent { get; }
     public CountryCodeType CodeType { get; }
+
+    public Country this[string twoOrThreeLetterCode]
+    {
+        get
+        {
+            if (!TryGetByCode(twoOrThreeLetterCode, out var country))
+                throw new InvalidOperationException("No country found with the specified code.");
+
+            return country;
+        }
+    }
+
+    public static bool TryGetByCode(string twoOrThreeLetterCode, out Country country)
+    {
+        if (twoOrThreeLetterCode is null)
+            throw new ArgumentNullException(nameof(twoOrThreeLetterCode));
+        
+        lock (Items)
+        {
+            if (twoOrThreeLetterCode.Length == 2)
+            {
+                if (TwoLetterCodeCountryIndexMap.TryGetValue(twoOrThreeLetterCode, out var index))
+                {
+                    country = Items[index];
+                    return true;
+                }
+            }
+            else if (twoOrThreeLetterCode.Length == 3)
+            {
+                if (ThreeLetterCodeCountryIndexMap.TryGetValue(twoOrThreeLetterCode, out var index))
+                {
+                    country = Items[index];
+                    return true;
+                }
+            }
+            else
+            {
+                throw new FormatException();
+            }
+        }
+
+        country = default;
+        return false;
+    }
 
     public static IReadOnlyCollection<Country> GetAllOfficiallyAssigned()
     {
@@ -451,8 +512,13 @@ public readonly struct Country : IEquatable<Country>, IComparable<Country>, ICom
             
             if (TryGetByName(name, out existingItem) && existingItem != item)
                 throw new InvalidOperationException("Country with same name already exists.");
+
+            var index = Items.Count;
             
             Items.Add(item);
+            TwoLetterCodeCountryIndexMap[twoLetterCode] = index;
+            ThreeLetterCodeCountryIndexMap[threeLetterCode] = index;
+            
             return item;
         }
     }

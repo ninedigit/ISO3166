@@ -8,11 +8,11 @@ public class CountryTests
     {
         var all = Country.GetAllOfficiallyAssigned();
         
-        Assert.Equal(249, all.Count);
+        Assert.Equal(250, all.Count);
     }
 
     [Fact]
-    public void TryGetByCountryName_ReturnsTrueForExistingCountry()
+    public void TryGetByName_ReturnsTrueForExistingCountry()
     {
         var exists = Country.TryGetByName("Slovakia", out var country);
         
@@ -21,7 +21,7 @@ public class CountryTests
     }
     
     [Fact]
-    public void TryGetByCountryName_ReturnsFalseForNonExistingCountry()
+    public void TryGetByName_ReturnsFalseForNonExistingCountry()
     {
         var exists = Country.TryGetByName("Slavicia", out var country);
         
@@ -129,5 +129,23 @@ public class CountryTests
     public void Parse_ThrowsFormatExceptionForNonExistingCountry()
     {
         Assert.Throws<FormatException>(() => Country.Parse("?"));
+    }
+
+    [Fact]
+    public void TryGetByCode_ReturnsCountryByTwoLetterCode()
+    {
+        var hasCountry = Country.TryGetByCode("SK", out var country);
+        
+        Assert.True(hasCountry);
+        Assert.Equal(Country.SK, country);
+    }
+    
+    [Fact]
+    public void TryGetByCode_ReturnsCountryByThreeLetterCode()
+    {
+        var hasCountry = Country.TryGetByCode("SVK", out var country);
+        
+        Assert.True(hasCountry);
+        Assert.Equal(Country.SK, country);
     }
 }
